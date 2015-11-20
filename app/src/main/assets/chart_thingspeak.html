@@ -1,0 +1,88 @@
+<html>
+<head>
+    <!--Load the AJAX API-->
+    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js'></script>
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+    <script type='text/javascript'>
+
+	//google.load('visualization', '1', {packages:['gauge']});
+	//google.setOnLoadCallback(initChart);
+	google.load('visualization', '1.0', {'packages':['corechart']});
+	google.setOnLoadCallback(loadData);
+
+	var chart;
+	var data;
+
+	// Use the data that we set in the UI, and was passed from the activity
+	var strNumResults = Android.FromWebChartActivity_strNumberOfResults()
+
+	function loadData() {
+	
+		// variable for the data point
+		var p;
+        var dimension = "entry_id";
+	    var feedsArray = [["Created_At", "Moisture" ]]
+		
+		$.getJSON('https://api.thingspeak.com/channels/28454/feed.json?results='+strNumResults, function(data){
+		for (var i = 0, len = data.feeds.length; i < len; i++) {
+		
+			//console.log(data.feeds[i]);
+			var tempData = data.feeds[i];
+
+			// Check if the data is a number, if not set the value to -3
+			var intMoisture = parseInt(tempData.field5) || -3;
+//			var stateitem = [tempData.created_at, tempData.field5];
+			var stateitem = [tempData.created_at, intMoisture];
+			 
+            feedsArray.push(stateitem);
+		}
+		
+		var feedsData = google.visualization.arrayToDataTable(feedsArray);
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+		
+		// Set chart options
+		var options = {'title':'Plant Moisture Data',
+                     'width':700,
+                     'height':300,
+                     'legend': { position: 'bottom' },
+                     'vAxis': {title: 'Moisture'},
+                     'hAxis': {title: 'Time'}
+
+                     };
+
+        chart.draw(feedsData,options);
+
+});
+		
+	
+	}
+
+	function initChart() {
+
+		chartData = new google.visualization.DataTable();
+		chartData.addColumn('string', 'Created_At');
+		chartData.addColumn('number', 'Entry_ID');
+//		data.addRows(1);
+//	        chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+//	        options = {width: 120, height: 120, redFrom: 90, redTo: 100,
+//	            yellowFrom:75, yellowTo: 90, minorTicks: 5};
+		loadData();
+//		setInterval('loadData()', 15000);
+	}
+	
+	function displayData(point) {
+	
+		data.setValue(0, 0, 'Light Level');
+		data.setValue(0, 1, point);
+		chart.draw(data, options);
+	
+	}
+
+    </script>
+</head>
+
+<body>
+<!--Div that will hold the pie chart-->
+<div id="chart_div" style="width:600; height:600"></div>
+</body>
+</html>
