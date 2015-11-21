@@ -12,27 +12,36 @@
 
 	var chart;
 	var data;
+	var timezone = 'America%2FNew_York'; // More Info: https://thingspeak.com/docs#support - Time Zone Reference
 
 	// Use the data that we set in the UI, and was passed from the activity
-	var strNumResults = Android.FromWebChartActivity_strNumberOfResults()
+
+	var strHtmlNumDays = Android.FromWebChartActivity_strNumberOfDays()
+	var intHeight = Android.FromWebChartActivity_intGetWebLayoutHeight()
+	var intWidth = Android.FromWebChartActivity_intGetWebLayoutWidth()
+	var strChannelNumber = Android.FromWebChartActivity_strChannelNumber()
+	var strChannelName = Android.FromWebChartActivity_strChannelName()
 
 	function loadData() {
 	
 		// variable for the data point
 		var p;
-        var dimension = "entry_id";
-	    var feedsArray = [["Created_At", "Moisture" ]]
-		
-		$.getJSON('https://api.thingspeak.com/channels/28454/feed.json?results='+strNumResults, function(data){
+        var dataField = 'field'+strChannelNumber; // "field5"
+	    var feedsArray = [["Created_At", strChannelName ]]
+
+		//EXAMPLE: https://api.thingspeak.com/channels/28454/feed.json?results=20&timezone=America%2FNew_York
+		// https://thingspeak.com/channels/28454/fields/5.json?days=1&timezone=America%2FNew_York
+
+		$.getJSON('https://api.thingspeak.com/channels/28454/feed.json?days='+strHtmlNumDays+'&timezone='+timezone, function(data){
 		for (var i = 0, len = data.feeds.length; i < len; i++) {
 		
 			//console.log(data.feeds[i]);
 			var tempData = data.feeds[i];
 
 			// Check if the data is a number, if not set the value to -3
-			var intMoisture = parseInt(tempData.field5) || -3;
-//			var stateitem = [tempData.created_at, tempData.field5];
-			var stateitem = [tempData.created_at, intMoisture];
+			var intDataValue = parseInt(tempData[dataField]) || -3;
+//			var stateitem = [tempData.created_at, tempData[dataField]];
+			var stateitem = [tempData.created_at, intDataValue];
 			 
             feedsArray.push(stateitem);
 		}
@@ -41,11 +50,11 @@
         var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
 		
 		// Set chart options
-		var options = {'title':'Plant Moisture Data',
-                     'width':700,
-                     'height':300,
+		var options = {'title':'Plant '+strChannelName+' Data',
+                     'width':intWidth, //500,
+                     'height':intHeight, // 250,
                      'legend': { position: 'bottom' },
-                     'vAxis': {title: 'Moisture'},
+                     'vAxis': {title: strChannelName},
                      'hAxis': {title: 'Time'}
 
                      };

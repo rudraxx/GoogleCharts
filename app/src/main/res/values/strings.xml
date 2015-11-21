@@ -1,4 +1,21 @@
 <resources>
-    <string name="app_name">GoogleCharts</string>
+    <string name="app_name">Abhishek Bhat Drip Irrigation</string>
     <string name="action_settings">Settings</string>
+    <string-array name="ChannelNumbers">
+        <item>PumpState</item>
+        <item>UserCmd</item>
+        <item>Red_LED</item>
+        <item>Blue_LED</item>
+        <item>SoilMoisture</item>
+    </string-array>
+
+    <string-array name="numDaysSpinner">
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>7</item>
+        <item>10</item>
+    </string-array>
+
+
 </resources>
